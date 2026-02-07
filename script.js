@@ -54,41 +54,58 @@ function displayCommitments() {
     const commitmentsList = document.getElementById('commitmentsList');
     let commitments = JSON.parse(localStorage.getItem('commitments')) || [];
     
-    // Thêm dữ liệu mẫu nếu chưa có
+    // Dữ liệu mẫu để hiển thị
+    const sampleCommitments = [
+        {
+            name: "Nguyễn Văn An",
+            email: "nguyenvanan@gmail.com",
+            actions: ["Giảm sử dụng nhựa", "Trồng cây xanh", "Tiết kiệm điện"],
+            timestamp: new Date(Date.now() - 3600000).toISOString()
+        },
+        {
+            name: "Trần Thị Bình",
+            email: "tranthib@yahoo.com",
+            actions: ["Phân loại rác", "Tiết kiệm nước"],
+            timestamp: new Date(Date.now() - 7200000).toISOString()
+        },
+        {
+            name: "Lê Minh Châu",
+            email: "leminhchau@outlook.com",
+            actions: ["Đi xe đạp", "Giảm sử dụng nhựa", "Tiết kiệm điện", "Trồng cây xanh"],
+            timestamp: new Date(Date.now() - 10800000).toISOString()
+        },
+        {
+            name: "Phạm Hoàng Dũng",
+            email: "phamhoangdung@gmail.com",
+            actions: ["Tiết kiệm điện", "Phân loại rác"],
+            timestamp: new Date(Date.now() - 14400000).toISOString()
+        },
+        {
+            name: "Hoàng Thị Em",
+            email: "hoangthiem@gmail.com",
+            actions: ["Trồng cây xanh", "Giảm sử dụng nhựa", "Tiết kiệm nước"],
+            timestamp: new Date(Date.now() - 18000000).toISOString()
+        },
+        {
+            name: "Võ Minh Khoa",
+            email: "vominhkhoa@gmail.com",
+            actions: ["Đi xe đạp", "Tiết kiệm điện"],
+            timestamp: new Date(Date.now() - 21600000).toISOString()
+        },
+        {
+            name: "Đặng Thị Lan",
+            email: "dangthilan@yahoo.com",
+            actions: ["Giảm sử dụng nhựa", "Phân loại rác", "Trồng cây xanh"],
+            timestamp: new Date(Date.now() - 25200000).toISOString()
+        }
+    ];
+    
+    // Nếu chưa có dữ liệu thật, dùng dữ liệu mẫu
     if (commitments.length === 0) {
-        commitments = [
-            {
-                name: "Nguyễn Văn An",
-                email: "nguyenvanan@gmail.com",
-                actions: ["Giảm sử dụng nhựa", "Trồng cây xanh", "Tiết kiệm điện"],
-                timestamp: new Date(Date.now() - 3600000).toISOString() // 1 giờ trước
-            },
-            {
-                name: "Trần Thị Bình",
-                email: "tranthib@yahoo.com",
-                actions: ["Phân loại rác", "Tiết kiệm nước"],
-                timestamp: new Date(Date.now() - 7200000).toISOString() // 2 giờ trước
-            },
-            {
-                name: "Lê Minh Châu",
-                email: "leminhchau@outlook.com",
-                actions: ["Đi xe đạp", "Giảm sử dụng nhựa", "Tiết kiệm điện", "Trồng cây xanh"],
-                timestamp: new Date(Date.now() - 10800000).toISOString() // 3 giờ trước
-            },
-            {
-                name: "Phạm Hoàng Dũng",
-                email: "phamhoangdung@gmail.com",
-                actions: ["Tiết kiệm điện", "Phân loại rác"],
-                timestamp: new Date(Date.now() - 14400000).toISOString() // 4 giờ trước
-            },
-            {
-                name: "Hoàng Thị Em",
-                email: "hoangthiem@gmail.com",
-                actions: ["Trồng cây xanh", "Giảm sử dụng nhựa", "Tiết kiệm nước"],
-                timestamp: new Date(Date.now() - 18000000).toISOString() // 5 giờ trước
-            }
-        ];
-        localStorage.setItem('commitments', JSON.stringify(commitments));
+        commitments = sampleCommitments;
+    } else {
+        // Kết hợp dữ liệu mẫu với dữ liệu thật
+        commitments = [...sampleCommitments, ...commitments];
     }
     
     if (commitments.length === 0) {
