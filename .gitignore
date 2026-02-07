@@ -1,0 +1,21 @@
+# File hướng dẫn admin (giữ bí mật)
+HUONG_DAN_ADMIN.txt
+
+# Video nếu quá lớn (> 100MB)
+# Bỏ comment dòng dưới nếu video quá lớn
+# video.mp4
+
+# File hệ thống
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Backup files
+*.bak
+*~
