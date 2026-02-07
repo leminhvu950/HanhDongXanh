@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Cam Kết - Admin</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 3px solid #2ecc71;
+        }
+
+        .header h1 {
+            color: #27ae60;
+            font-size: 2rem;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+            padding: 0.8rem 1rem;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1rem;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: #2ecc71;
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-export {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-export:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .btn-clear {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-clear:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+        }
+
+        .btn-back {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .btn-back:hover {
+            background: #7f8c8d;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        thead {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: white;
+        }
+
+        th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .action-badge {
+            display: inline-block;
+            padding: 0.3rem 0.6rem;
+            background: #2ecc71;
+            color: white;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            margin: 0.2rem;
+        }
+
+        .btn-delete {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-delete:hover {
+            background: #c0392b;
+            transform: scale(1.05);
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 3rem;
+            color: #7f8c8d;
+            font-size: 1.2rem;
+        }
+
+        .timestamp {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+
+            .search-box {
+                width: 100%;
+            }
+
+            table {
+                font-size: 0.9rem;
+            }
+
+            th, td {
+                padding: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌍 Quản Lý Cam Kết Bảo Vệ Môi Trường</h1>
+            <button class="btn btn-back" onclick="window.location.href='index.html'">
+                ← Về Trang Chủ
+            </button>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="totalCommitments">0</div>
+                <div class="stat-label">Tổng Cam Kết</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalActions">0</div>
+                <div class="stat-label">Tổng Hành Động</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="todayCommitments">0</div>
+                <div class="stat-label">Hôm Nay</div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <input type="text" 
+                   class="search-box" 
+                   id="searchBox" 
+                   placeholder="🔍 Tìm kiếm theo tên hoặc email...">
+            <button class="btn btn-export" onclick="exportToCSV()">
+                📥 Xuất Excel
+            </button>
+            <button class="btn btn-clear" onclick="clearAllData()">
+                🗑️ Xóa Tất Cả
+            </button>
+        </div>
+
+        <div class="table-container">
+            <table id="commitmentsTable">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Họ Tên</th>
+                        <th>Email</th>
+                        <th>Hành Động Cam Kết</th>
+                        <th>Thời Gian</th>
+                        <th>Thao Tác</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <tr>
+                        <td colspan="6" class="no-data">Đang tải dữ liệu...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // ===== BẢO VỆ MẬT KHẨU =====
+        // Kiểm tra xem đã đăng nhập chưa
+        const isLoggedIn = sessionStorage.getItem('adminLoggedIn');
+        
+        if (!isLoggedIn) {
+            const password = prompt('🔐 Nhập mật khẩu admin:\n\n(Mật khẩu mặc định: admin123)');
+            
+            if (password !== 'admin123') {
+                alert('❌ Sai mật khẩu! Bạn không có quyền truy cập.');
+                window.location.href = 'index.html';
+            } else {
+                // Lưu trạng thái đăng nhập (chỉ trong phiên làm việc)
+                sessionStorage.setItem('adminLoggedIn', 'true');
+            }
+        }
+
+        let allCommitments = [];
+
+        // Load dữ liệu khi trang load
+        window.addEventListener('load', () => {
+            loadCommitments();
+            updateStats();
+        });
+
+        // Load danh sách cam kết
+        function loadCommitments() {
+            allCommitments = JSON.parse(localStorage.getItem('commitments')) || [];
+            displayCommitments(allCommitments);
+        }
+
+        // Hiển thị danh sách
+        function displayCommitments(commitments) {
+            const tableBody = document.getElementById('tableBody');
+            
+            if (commitments.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="6" class="no-data">Chưa có dữ liệu cam kết</td></tr>';
+                return;
+            }
+
+            tableBody.innerHTML = commitments.map((commitment, index) => {
+                const actionBadges = commitment.actions.map(action => 
+                    `<span class="action-badge">${action}</span>`
+                ).join('');
+                
+                const date = new Date(commitment.timestamp);
+                const formattedDate = date.toLocaleString('vi-VN');
+
+                return `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td><strong>${commitment.name}</strong></td>
+                        <td>${commitment.email}</td>
+                        <td>${actionBadges}</td>
+                        <td class="timestamp">${formattedDate}</td>
+                        <td>
+                            <button class="btn-delete" onclick="deleteCommitment(${index})">
+                                Xóa
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Cập nhật thống kê
+        function updateStats() {
+            const commitments = JSON.parse(localStorage.getItem('commitments')) || [];
+            const totalCommitments = commitments.length;
+            
+            let totalActions = 0;
+            commitments.forEach(c => {
+                totalActions += c.actions.length;
+            });
+
+            const today = new Date().toDateString();
+            const todayCommitments = commitments.filter(c => {
+                const commitDate = new Date(c.timestamp).toDateString();
+                return commitDate === today;
+            }).length;
+
+            document.getElementById('totalCommitments').textContent = totalCommitments;
+            document.getElementById('totalActions').textContent = totalActions;
+            document.getElementById('todayCommitments').textContent = todayCommitments;
+        }
+
+        // Tìm kiếm
+        document.getElementById('searchBox').addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const filtered = allCommitments.filter(commitment => 
+                commitment.name.toLowerCase().includes(searchTerm) ||
+                commitment.email.toLowerCase().includes(searchTerm)
+            );
+            displayCommitments(filtered);
+        });
+
+        // Xóa một cam kết
+        function deleteCommitment(index) {
+            if (!confirm('Bạn có chắc muốn xóa cam kết này?')) return;
+            
+            allCommitments.splice(index, 1);
+            localStorage.setItem('commitments', JSON.stringify(allCommitments));
+            
+            // Cập nhật số lượng
+            const totalCommitments = parseInt(localStorage.getItem('totalCommitments')) || 0;
+            localStorage.setItem('totalCommitments', Math.max(0, totalCommitments - 1));
+            
+            loadCommitments();
+            updateStats();
+            alert('Đã xóa cam kết thành công!');
+        }
+
+        // Xóa tất cả
+        function clearAllData() {
+            if (!confirm('⚠️ BẠN CÓ CHẮC MUỐN XÓA TẤT CẢ DỮ LIỆU?\n\nHành động này không thể hoàn tác!')) return;
+            
+            if (!confirm('Xác nhận lần cuối: Xóa tất cả dữ liệu cam kết?')) return;
+            
+            localStorage.removeItem('commitments');
+            localStorage.setItem('totalCommitments', '1247'); // Reset về số mặc định
+            
+            allCommitments = [];
+            loadCommitments();
+            updateStats();
+            alert('Đã xóa tất cả dữ liệu!');
+        }
+
+        // Xuất Excel (CSV)
+        function exportToCSV() {
+            if (allCommitments.length === 0) {
+                alert('Không có dữ liệu để xuất!');
+                return;
+            }
+
+            let csv = 'STT,Họ Tên,Email,Hành Động Cam Kết,Thời Gian\n';
+            
+            allCommitments.forEach((commitment, index) => {
+                const actions = commitment.actions.join('; ');
+                const date = new Date(commitment.timestamp).toLocaleString('vi-VN');
+                csv += `${index + 1},"${commitment.name}","${commitment.email}","${actions}","${date}"\n`;
+            });
+
+            // Tạo file và download
+            const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            
+            link.setAttribute('href', url);
+            link.setAttribute('download', `cam-ket-bao-ve-moi-truong-${Date.now()}.csv`);
+            link.style.visibility = 'hidden';
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            alert('Đã xuất file Excel thành công!');
+        }
+    </script>
+</body>
+</html>
