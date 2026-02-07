@@ -1,3 +1,134 @@
+// ===== HELPER FUNCTIONS =====
+// Che tên: "Nguyễn Văn An" -> "Nguyễn V** A*"
+function maskName(fullName) {
+    const parts = fullName.trim().split(' ');
+    if (parts.length === 1) {
+        return parts[0].charAt(0) + '*'.repeat(parts[0].length - 1);
+    }
+    
+    const firstName = parts[0]; // Họ giữ nguyên
+    const lastName = parts[parts.length - 1]; // Tên chính
+    const middleNames = parts.slice(1, -1); // Tên đệm
+    
+    // Che tên đệm
+    const maskedMiddle = middleNames.map(name => name.charAt(0) + '*'.repeat(name.length - 1));
+    
+    // Che một phần tên chính
+    const maskedLast = lastName.charAt(0) + '*'.repeat(lastName.length - 1);
+    
+    return [firstName, ...maskedMiddle, maskedLast].join(' ');
+}
+
+// Che email: "example@gmail.com" -> "ex***@g***.com"
+function maskEmail(email) {
+    const [localPart, domain] = email.split('@');
+    const [domainName, extension] = domain.split('.');
+    
+    const maskedLocal = localPart.charAt(0) + localPart.charAt(1) + '*'.repeat(Math.max(localPart.length - 2, 1));
+    const maskedDomain = domainName.charAt(0) + '*'.repeat(Math.max(domainName.length - 1, 1));
+    
+    return `${maskedLocal}@${maskedDomain}.${extension}`;
+}
+
+// Lấy chữ cái đầu cho avatar
+function getInitials(name) {
+    const parts = name.trim().split(' ');
+    if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
+    return parts[0].charAt(0).toUpperCase() + parts[parts.length - 1].charAt(0).toUpperCase();
+}
+
+// Format thời gian
+function getTimeAgo(timestamp) {
+    const now = new Date();
+    const time = new Date(timestamp);
+    const diff = Math.floor((now - time) / 1000); // seconds
+    
+    if (diff < 60) return 'Vừa xong';
+    if (diff < 3600) return `${Math.floor(diff / 60)} phút trước`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)} giờ trước`;
+    return `${Math.floor(diff / 86400)} ngày trước`;
+}
+
+// Hiển thị danh sách cam kết
+function displayCommitments() {
+    const commitmentsList = document.getElementById('commitmentsList');
+    let commitments = JSON.parse(localStorage.getItem('commitments')) || [];
+    
+    // Thêm dữ liệu mẫu nếu chưa có
+    if (commitments.length === 0) {
+        commitments = [
+            {
+                name: "Nguyễn Văn An",
+                email: "nguyenvanan@gmail.com",
+                actions: ["Giảm sử dụng nhựa", "Trồng cây xanh", "Tiết kiệm điện"],
+                timestamp: new Date(Date.now() - 3600000).toISOString() // 1 giờ trước
+            },
+            {
+                name: "Trần Thị Bình",
+                email: "tranthib@yahoo.com",
+                actions: ["Phân loại rác", "Tiết kiệm nước"],
+                timestamp: new Date(Date.now() - 7200000).toISOString() // 2 giờ trước
+            },
+            {
+                name: "Lê Minh Châu",
+                email: "leminhchau@outlook.com",
+                actions: ["Đi xe đạp", "Giảm sử dụng nhựa", "Tiết kiệm điện", "Trồng cây xanh"],
+                timestamp: new Date(Date.now() - 10800000).toISOString() // 3 giờ trước
+            },
+            {
+                name: "Phạm Hoàng Dũng",
+                email: "phamhoangdung@gmail.com",
+                actions: ["Tiết kiệm điện", "Phân loại rác"],
+                timestamp: new Date(Date.now() - 14400000).toISOString() // 4 giờ trước
+            },
+            {
+                name: "Hoàng Thị Em",
+                email: "hoangthiem@gmail.com",
+                actions: ["Trồng cây xanh", "Giảm sử dụng nhựa", "Tiết kiệm nước"],
+                timestamp: new Date(Date.now() - 18000000).toISOString() // 5 giờ trước
+            }
+        ];
+        localStorage.setItem('commitments', JSON.stringify(commitments));
+    }
+    
+    if (commitments.length === 0) {
+        commitmentsList.innerHTML = '<div class="no-commitments">Chưa có ai cam kết. Hãy là người đầu tiên! 🌱</div>';
+        return;
+    }
+    
+    // Lấy 10 cam kết gần nhất
+    const recentCommitments = commitments.slice(-10).reverse();
+    
+    commitmentsList.innerHTML = recentCommitments.map(commitment => {
+        const maskedName = maskName(commitment.name);
+        const maskedEmail = maskEmail(commitment.email);
+        const initials = getInitials(commitment.name);
+        const timeAgo = getTimeAgo(commitment.timestamp);
+        
+        const actionBadges = commitment.actions.slice(0, 3).map(action => 
+            `<span class="commitment-badge">${action}</span>`
+        ).join('');
+        
+        const moreActions = commitment.actions.length > 3 
+            ? `<span class="commitment-badge">+${commitment.actions.length - 3}</span>` 
+            : '';
+        
+        return `
+            <div class="commitment-item">
+                <div class="commitment-avatar">${initials}</div>
+                <div class="commitment-info">
+                    <div class="commitment-name">${maskedName}</div>
+                    <div class="commitment-email">${maskedEmail}</div>
+                    <div class="commitment-actions">
+                        ${actionBadges}${moreActions}
+                    </div>
+                </div>
+                <div class="commitment-time">${timeAgo}</div>
+            </div>
+        `;
+    }).join('');
+}
+
 // ===== MOBILE MENU TOGGLE =====
 const hamburger = document.querySelector('.hamburger');
 const navMenu = document.querySelector('.nav-menu');
@@ -70,6 +201,9 @@ commitmentForm.addEventListener('submit', (e) => {
     totalCommitments++;
     localStorage.setItem('totalCommitments', totalCommitments);
     totalCommitmentsElement.textContent = totalCommitments.toLocaleString();
+    
+    // Cập nhật danh sách cam kết
+    displayCommitments();
     
     // Hiển thị thông báo cảm ơn
     showThankYouMessage();
@@ -245,6 +379,9 @@ window.addEventListener('load', () => {
         document.body.style.transition = 'opacity 0.5s ease';
         document.body.style.opacity = '1';
     }, 100);
+    
+    // Hiển thị danh sách cam kết khi trang load
+    displayCommitments();
 });
 
 // ===== PREVENT FORM RESUBMISSION =====
